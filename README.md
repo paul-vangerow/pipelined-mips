@@ -142,6 +142,96 @@ I decided to fix this in the way MIPS I was designed, through use of a branch de
 
 ## CPU Design
 
-With the general gist of all the issues sorted, it was time to figure out how I was going to lay out my CPU and make all of the pipeline stages work. I decided to do this in a block diagram, with internal functionality being obfuscated, whilst preserving general layout and intent:
+With the general gist of all the issues sorted, it was time to start thinking about the actual design of the CPU and how each part was actually going to work. I figured the easiest way to implement the pipelined functionality would be by making each stage of the pipeline its own 'block', with a well defined behaviour and set inputs and outputs. Through this approach I would be able to figure out each part bit by bit, hopefully making the whole CPU design process a lot more intuitive. 
+
+### FETCH
+
+**Functionality**
+- Send a read request through the Avalon bus for the instruction at address (PC)
+- Pre-Increment the PC (Allows for modification by fetch stall and Jump/Branch)
+- Deal with the Reset (Start)
+- Deal with the PC being 0 (Stop)
+
+**Ports**
+- Fetch Stall
+- Current PC Value
+- PC Jump Value
+- Initiate Jump
+- Avalon Connection
+
+### DECODE
+
+**Functionality**
+- Recieve the read value from the Avalon bus
+- Decode the instruction and convert it into its individual control signals
+- Read Register Values
+
+**Ports**
+- Avalon Connection
+- Register Read Connection (Address, ReadData) for two registers.
+- Control Signals (Opcode, rt, rd, rs, function code, shamt, address, imm)
+- Register Value outputs
+
+### Register File
+
+**Functionality**
+- Contain 32 registers
+- Abillity to write to 1 register and read from 2
+
+**Ports**
+- 3 Address ports
+- Write Enable
+- Read Data (1/2)
+
+### Execute
+
+**Functionality**
+- Calculate ALU output based on register inputs and control inputs
+- Calculate branch conditionals based on registers
+
+**Ports**
+- RT, RS
+- Register Write Enable
+- Jump Enable
+- Jump Address
+- Control signals
+- LO/HI Write Enable
+- LO/HI Write Data
+
+### Memory
+
+**Functionality**
+- Interface with the Avalon bus to either send or request data (according to control signals)
+
+**Ports**
+- Control Signals
+- Avalon Bus
+
+### Writeback
+
+**Functionality**
+- Write data from the Avalon bus to a register
+- Write data from the ALU to a register
+
+**Ports**
+- ALU Output
+- Control Signals
+- Avalon Bus
+- Register File Write Enable
+- Register Write Data
+- Register Write Address
+
+### Hazard Manager
+
+**Functionality**
+- Deal with data hazards by storing register addresses and output values from ALU and MEM
+- Do the correct comparisons and provide pipeline stages values
+
+**Ports**
+- Control Signals
+- More control signals
+- Register value outputs
+
+I will in all likelihood add this component at the end and make modifications to the other components to ensure that it works correctly.
 
 
