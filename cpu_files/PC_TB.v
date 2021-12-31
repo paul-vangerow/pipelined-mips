@@ -11,6 +11,7 @@ module PC_TB ();
     logic [31:0] PC_Out;
     logic fetch_stall;
     logic active;
+    logic [2:0] check;
 
     initial begin
 
@@ -21,9 +22,10 @@ module PC_TB ();
         jump_en = 0;
         PC_Stall = 0;
         branch_en = 0;
+        rst = 0;
         
         repeat(100) begin
-            #10; clk = ~clk;
+            #50; clk = ~clk;
         end
 
         $fatal(1, "Timeout");
@@ -37,18 +39,23 @@ module PC_TB ();
         @ (posedge clk);
         rst = 1;
         @ (posedge clk);
-        rst = 0;
         @ (posedge clk);
         @ (posedge clk);
+         rst = 0;
+        @ (posedge clk);
+        @ (posedge clk);
+         @ (posedge clk);
+        
         @ (posedge clk);
         PC_Stall = 1;
         @ (posedge clk);
-        @ (posedge clk);
-        @ (posedge clk);
         PC_Stall = 0;
+        @ (posedge clk);
+        
+        
 
     end
 
-    PC PC(clk, rst, PC_JVal, jump_en, branch_en, PC_Stall, PC_Out, fetch_stall, active);
+    PC PC(.clk(clk), .rst(rst), .PC_JVal(PC_JVal), .jump_en(jump_en), .branch_en(branch_en), .PC_Stall(PC_Stall), .PC_Out(PC_Out), .fetch_stall(fetch_stall), .active(active), .check(check));
 
 endmodule
