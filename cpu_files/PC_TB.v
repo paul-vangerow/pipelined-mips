@@ -11,7 +11,6 @@ module PC_TB ();
     logic [31:0] PC_Out;
     logic fetch_stall;
     logic active;
-    logic [2:0] check;
 
     initial begin
 
@@ -44,18 +43,38 @@ module PC_TB ();
          rst = 0;
         @ (posedge clk);
         @ (posedge clk);
-         @ (posedge clk);
-        
+        @ (posedge clk);
         @ (posedge clk);
         PC_Stall = 1;
         @ (posedge clk);
+        @ (posedge clk);
+        @ (posedge clk);
         PC_Stall = 0;
         @ (posedge clk);
-        
-        
-
+        @ (posedge clk);
+        @ (posedge clk);
+        PC_JVal = 32'h00000010;
+        branch_en = 1;
+        @ (posedge clk);
+        branch_en = 0;
+        @ (posedge clk);
+        @ (posedge clk);
+        @ (posedge clk);
+        PC_JVal = 32'h0000FFF4;
+        branch_en = 1;
+        @ (posedge clk);
+        branch_en = 0;
+        @ (posedge clk);
+        @ (posedge clk);
+        PC_JVal = 0;
+        jump_en = 1;
+        @ (posedge clk);
+        jump_en = 0;
+        @ (posedge clk);
+        @ (posedge clk);
+        @ (posedge clk);
     end
 
-    PC PC(.clk(clk), .rst(rst), .PC_JVal(PC_JVal), .jump_en(jump_en), .branch_en(branch_en), .PC_Stall(PC_Stall), .PC_Out(PC_Out), .fetch_stall(fetch_stall), .active(active), .check(check));
+    PC PC(.clk(clk), .rst(rst), .PC_JVal(PC_JVal), .jump_en(jump_en), .branch_en(branch_en), .PC_Stall(PC_Stall), .PC_Out(PC_Out), .fetch_stall(fetch_stall), .active(active));
 
 endmodule

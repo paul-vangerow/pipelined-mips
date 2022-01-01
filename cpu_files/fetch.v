@@ -9,22 +9,13 @@ module fetch (
     // Avalon Bus
 
     output logic read,
-    output logic byte_en,
+    output logic [3:0] byte_en,
     output logic[31:0] address
 
 );
 
-always_ff @ (posedge clk) begin
-    
-    if (stall | ~active) begin
-        read <= 0;
-        address <= 32'hxxxxxxxx;
-    end
-    else begin
-        read <= 1;
-        address <= PC_Val;
-    end
-
-end
+assign address = (stall == 1 | PC_Val == 0) ? 32'hxxxxxxxx : PC_Val;
+assign read = ~(stall == 1 | PC_Val == 0);
+assign byte_en = (stall == 1 | PC_Val == 0) ? 4'b0000 : 4'b1111;
 
 endmodule
